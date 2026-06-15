@@ -31,30 +31,6 @@ AI Financial Assistant is a full-stack web application that helps users analyze 
 
 * Gemini API
 
-## Getting Started
-
-### Backend
-
-```bash
-cd backend
-npm install
-npm run dev
-```
-
-Create a `.env` file:
-
-```env
-GEMINI_API_KEY=your_api_key
-```
-
-### Frontend
-
-```bash
-cd frontend/my-app
-npm install
-npm start
-```
-
 ## How It Works
 
 1. User logs in using Auth0.
