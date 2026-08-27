@@ -9,6 +9,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "AI Financial Assistant API is running"
+  });
+});
+
 app.use("/api", uploadRoute);
 
 const PORT = process.env.PORT || 5000;
