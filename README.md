@@ -2,6 +2,8 @@
 
 AI Financial Assistant is a full-stack web application that helps users analyze their bank transactions using Google's Gemini API. Users can securely log in, upload a bank statement in CSV format, and receive AI-generated insights about their spending patterns and financial habits.
 
+Live Website - https://ai-financial-assistant-peach.vercel.app/
+
 ## Features
 
 * Secure authentication with Auth0
