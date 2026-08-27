@@ -11,10 +11,8 @@ app.use(express.json());
 
 app.use("/api", uploadRoute);
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
-  // You can safely remove these logs now once it works
-  console.log("API Key loaded:", !!process.env.GEMINI_API_KEY); 
 });
