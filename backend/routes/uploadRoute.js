@@ -3,7 +3,7 @@ import multer from "multer";
 import fs from "fs";
 import csv from "csv-parser";
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 const router = express.Router();
 
@@ -11,47 +11,47 @@ const upload = multer({
   dest: "uploads/",
 });
 
-const genAI = new GoogleGenerativeAI(
-  process.env.GEMINI_API_KEY
-);
-
-
-router.get("/test", async (req, res) => {
-
-   try {
-
-      const model = genAI.getGenerativeModel({
-         model: "gemini-2.5-flash",
-      });
-
-      const result = await model.generateContent(
-         "Hello"
-      );
-
-      const response =
-         await result.response.text();
-
-      res.json({
-         message: response,
-      });
-
-   } catch (error) {
-
-      console.log(error);
-
-      res.status(500).json({
-         error: error.message,
-      });
-   }
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 
+// Test Gemini API
+router.get("/test", async (req, res) => {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: "Hello",
+    });
 
+    res.json({
+      message: response.text,
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      error: error.message,
+    });
+  }
+});
+
+
+// Upload CSV
 router.post(
   "/upload",
   upload.single("file"),
 
   async (req, res) => {
+
+    // Check if file was uploaded
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded",
+      });
+    }
 
     const results = [];
 
@@ -67,11 +67,7 @@ router.post(
 
         try {
 
-          const model =
-            genAI.getGenerativeModel({
-              model: "gemini-2.5-flash",
-            });
-
+          // Prompt for Gemini
           const prompt = `
 Analyze these bank transactions.
 
@@ -85,15 +81,19 @@ Transactions:
 ${JSON.stringify(results)}
 `;
 
-          const result =
-            await model.generateContent(prompt);
+          // Send request to Gemini
+          const response = await ai.models.generateContent({
+            model: "gemini-3.6-flash",
+            contents: prompt,
+          });
 
-          const response =
-            result.response.text();
+          // Get AI response
+          const analysis = response.text;
 
+          // Send response to frontend
           res.json({
             success: true,
-            analysis: response,
+            analysis: analysis,
             transactions: results,
           });
 
@@ -103,9 +103,20 @@ ${JSON.stringify(results)}
 
           res.status(500).json({
             success: false,
-            message: "Error generating analysis",
+            message: error.message,
           });
         }
+      })
+
+      .on("error", (error) => {
+
+        console.log(error);
+
+        res.status(500).json({
+          success: false,
+          message: "Error reading CSV file",
+        });
+
       });
   }
 );
